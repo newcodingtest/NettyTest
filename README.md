@@ -3,5 +3,5 @@
 
 
 ## 구성도
-![image](https://user-images.githubusercontent.com/57785267/164415380-2c5340bb-1def-4996-98e9-08bef2532596.png)
+![image](https://user-images.githubusercontent.com/57785267/164416055-2f7207df-73c3-4ebe-99a1-f349d0750532.png)
 
