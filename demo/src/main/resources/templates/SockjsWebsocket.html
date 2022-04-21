@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+    <title>Hello WebSocket</title>
+    <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+   
+    <script src="/webjars/jquery/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/stomp.min.js"></script>
+ 
+</head>
+<body>
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
+    enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+<div id="main-content" class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="connect">WebSocket connection:</label>
+                    <button id="connect" class="btn btn-default" type="submit">로그인</button>
+                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">로그아웃
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="name">What is your name?</label>
+                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
+                </div>
+                <button id="send" class="btn btn-default" type="submit">Send</button>
+            </form>
+            
+            <h1 class ="h1-clock"></h1>
+            
+        </div>
+    </div>
+    <div class="row">
+       
+        <div class="col-md-10" style="overflow-y:scroll; width:400;  height:100; padding:4px">
+            <table id="conversation" class="table table-striped" border="1px" >
+                <thead>
+                송신네트워크상태(8081)<p id="sstatus"></p>
+                <tr>
+                    <th>송신날짜  <p id="sdate"></p></th>
+                    <th>송신데이터  <p id="sdata"></p></th>
+                    <th>분석/처리  <p id="sresult"></p></th>
+                    <th>저장여부  <p id="ssave"></p></th>
+                </tr>
+                </thead>
+                <tbody id="greeting2">
+	          
+                </tbody>
+            </table>
+    
+    </div>
+        
+        <div class="col-md-10" style="overflow-y:scroll; width:400;  height:100; padding:4px">
+            <table id="conversation" class="table table-striped" border="1px">
+                <thead>
+                팬딩네트워크상태(8082)<p id="pstatus"></p>
+                <tr>
+                    <th>팬딩 날짜 <p id="pdate"></p></th>
+                    <th>팬딩 데이터 <p id="pdata"></p></th>
+                    <th>팬딩 상세원인 <p id="pwhy"></p></th>
+                </tr>
+                </thead>
+                <tbody id="greeting3">
+                
+                </tbody>
+            </table>
+        </div>
+        
+                <div class="col-md-2">
+            <table id="conversation" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>수신날짜  <p id="rdate"></p></th>
+                    <th>수신데이터  <p id="rdata"></p></th>
+                    <th>분석/처리  <p id="rrsult"></p></th>
+                </tr>
+                </thead>
+                <tbody id="greeting1">
+                </tbody>
+            </table>
+        </div>
+     </div>
+</div>
+</body>
+</html>
+   <script src="/app.js"></script>
+   <script src="/clock.js" charset="utf-8"></script>
