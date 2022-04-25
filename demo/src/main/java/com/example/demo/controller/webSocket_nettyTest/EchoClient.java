@@ -31,11 +31,11 @@ public void start() throws Exception {
         Bootstrap b = new Bootstrap();  // bootstrap 생성
         b.group(group)  // 클라이언트 이벤트 처리할 EventLoopGroup을 지정.
                 .channel(NioSocketChannel.class)    // 채널 유형 NIO 지정
-                .remoteAddress(new InetSocketAddress("192.168.0.62",8082)) // 서버의 InetSocketAddress를 설정하면 내부적으로 연결 시도
                 .handler(new ChannelInitializer<SocketChannel>() { //핸들러 등록, ChannelInitializer은 ChannelInboundHandlerAdapter 상속 받고있는데
                 	//ChannelInboundHandlerAdapter를 상속받고있는 커스텀핸들러를 생성하면 유저가 내부 행동을 조작할수있음
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {    // 채널이 생성될 때 파이프라인에 EchoClientHandler 하나를 추가
+
                         ChannelPipeline pipeline = ch.pipeline();
                         		pipeline.addLast(new EchoClientHandler());
                     }
@@ -46,6 +46,16 @@ public void start() throws Exception {
    // } finally {
    //     group.shutdownGracefully().sync();  // 스레드 풀을 종료하고 모든 리소스를 해제함
    // }
+
+                        ch.pipeline().addLast(new EchoClientHandler());
+                    }
+                });
+        ChannelFuture f = b.connect().sync();   // 원격 피어로 연결하고 연결이 완료되기를 기다림
+        f.channel().closeFuture().sync();   // 채널이 닫힐 때까지 블로킹함.
+    } finally {
+        group.shutdownGracefully().sync();  // 스레드 풀을 종료하고 모든 리소스를 해제함
+    }
+
 }
 
 public static void main(String[] args) throws Exception {
