@@ -2,6 +2,8 @@ package com.example.demo.controller.webSocket_nettyTest;
 
 import java.nio.charset.Charset;  
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,28 +29,38 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 		nettyClient = new EchoClient();
 	}
 	
+	public boolean getConnectionFlag() {
+		return this.connectionFlag;
+	}
+	
 	 //채널이 활성화 되면 동작
     @Override
     public void channelActive(ChannelHandlerContext ctx){
     	System.out.println("서버와의 채널이 연결되었음");
     	connectionFlag = true;
-    	
-	  	//while(connectionFlag) {
-	  	 //입력받은 문자열
-	      String sendMessage = new Scanner(System.in).nextLine();
-	
-	      ByteBuf messageBuffer = Unpooled.buffer();
-	      
-	      //입력받은 문자열을 바이트로 전환하여 바이트버퍼에 담는다.
-	      messageBuffer.writeBytes(sendMessage.getBytes());
-	
-	      StringBuilder builder = new StringBuilder();
-	      builder.append("전송: ");
-	      builder.append(sendMessage);
-	
-	      System.out.println(builder.toString());
-	      ctx.writeAndFlush(messageBuffer);
-	//  	  }
+
+			
+			      Timer scheduler = new Timer();
+			      TimerTask task = new TimerTask() {
+					
+					@Override
+					public void run() {
+						String sendMessage = "test";
+			  			
+					      ByteBuf messageBuffer = Unpooled.buffer();
+					      
+					      //입력받은 문자열을 바이트로 전환하여 바이트버퍼에 담는다.
+					      messageBuffer.writeBytes(sendMessage.getBytes());
+					
+					      StringBuilder builder = new StringBuilder();
+					      builder.append("전송: ");
+					      builder.append(sendMessage);
+					      
+						  ctx.writeAndFlush(messageBuffer);
+					}
+				};
+				scheduler.scheduleAtFixedRate(task, 1000, 10000); //1초뒤 10초마다 전송  
+
     }
 
     /**
@@ -97,7 +109,6 @@ public class EchoClientHandler extends ChannelInboundHandlerAdapter {
 			}
         }, 1L, TimeUnit.SECONDS);
     }
-    
     
     //채널의 inbound buffer에서 읽을 값이 있으면 읽는다.
     @Override

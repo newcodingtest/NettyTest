@@ -24,38 +24,15 @@ public class NettySocketHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
     
-/*        if (msg instanceof WebSocketFrame) {
-            System.out.println("This is a WebSocket frame");
-            System.out.println("Client Channel : " + ctx.channel());
-            if (msg instanceof BinaryWebSocketFrame) {
-                System.out.println("BinaryWebSocketFrame Received : ");
-                System.out.println(((BinaryWebSocketFrame) msg).content());
-            } else if (msg instanceof TextWebSocketFrame) {
-                System.out.println("TextWebSocketFrame Received : ");
-                ctx.channel().writeAndFlush(
-                        new TextWebSocketFrame("Message recieved : " + ((TextWebSocketFrame) msg).text()));
-                System.out.println(((TextWebSocketFrame) msg).text());
-            } else if (msg instanceof PingWebSocketFrame) {
-                System.out.println("PingWebSocketFrame Received : ");
-                System.out.println(((PingWebSocketFrame) msg).content());
-            } else if (msg instanceof PongWebSocketFrame) {
-                System.out.println("PongWebSocketFrame Received : ");
-                System.out.println(((PongWebSocketFrame) msg).content());
-            } else if (msg instanceof CloseWebSocketFrame) {
-                System.out.println("CloseWebSocketFrame Received : ");
-                System.out.println("ReasonText :" + ((CloseWebSocketFrame) msg).reasonText());
-                System.out.println("StatusCode : " + ((CloseWebSocketFrame) msg).statusCode());
-            } else {
-                System.out.println("Unsupported WebSocketFrame");
-            }*/
             String readMessage = ((ByteBuf) msg).toString(Charset.defaultCharset());
             
             //내부적으로 기록과 전송의 두가지 메서드 실행, write():채널에 데이터 기록, flush():채널에 기록된 데이터 서버로전송
             //flush로 채널에 있던것을 서버로 전송했기때문에 추구 syso로 출력해볼수 있는것이다.
             //write만 썻을때는 콘솔에 출력이 안됨을 확인하였음
-            ctx.writeAndFlush(msg);
+            //ctx.writeAndFlush(msg);
+            ctx.write(msg);
             //3. 수신된 데이터를 가지고 있는 네티의 바이트 버퍼 객체로 부터 문자열 객체를 읽어온다.
-            System.out.println("수신한 문자열 ["+readMessage +"]");
+            //System.out.println("수신한 문자열 ["+readMessage +"]");
            
         }
 	
@@ -108,8 +85,6 @@ public class NettySocketHandler extends ChannelInboundHandlerAdapter {
       ctx.close();
     }
      */
-	   
-	   
 
 	  private void changeNetworkTrue(int port) {
 		  network.changeNetworkTrue(port);
