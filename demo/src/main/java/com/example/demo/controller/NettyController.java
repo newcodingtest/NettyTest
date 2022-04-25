@@ -7,8 +7,11 @@ import org.springframework.stereotype.Controller;
 
 import com.example.demo.controller.webSocket_nettyTest.NettyServer;
 
+import lombok.extern.slf4j.Slf4j;
+
 
 @Controller
+@Slf4j
 public class NettyController {
 
 	private NettyServer server;
@@ -32,6 +35,8 @@ public class NettyController {
 	}
 	
 	@PreDestroy
-	private void destory() {
+	private void destory() throws InterruptedException {
+		log.info("서버종료");
+		server.serverStop();
 	}
 }

@@ -8,52 +8,63 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class NettyServer {
     private static final int PORT = 8082;
 
-  public void run() {
+    private ServerBootstrap b = new ServerBootstrap();
+    private EventLoopGroup bossGroup; 
+    private EventLoopGroup workerGroup; 
+    
+  public void run() throws InterruptedException {
         // Configure the server.
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1); //Å¬¶óÀÌ¾ğÆ®ÀÇ ¿¬°áÀ» ¼ö¶ôÇÏ´Â ºÎ¸ğ½º·¹µå ±×·ì, NioEventLoopGroup(1): ÃÖ´ë »ı¼º½º·¹µå¼ö 1°³ ¼³Á¤
-        EventLoopGroup workerGroup = new NioEventLoopGroup(); //¿¬°áµÈ Å¬¶óÀÌ¾ğÆ® ¼ÒÄÏÀ¸·ÎºÎÅÍ µ¥ÀÌÅÍ ÀÔÃâ·Â ¹× ÀÌº¥Æ® Ã³¸® ´ã´ç
-        try {
+        bossGroup = new NioEventLoopGroup(1); //í´ë¼ì´ì–¸íŠ¸ì˜ ì—°ê²°ì„ ìˆ˜ë½í•˜ëŠ” ë¶€ëª¨ìŠ¤ë ˆë“œ ê·¸ë£¹, NioEventLoopGroup(1): ìµœëŒ€ ìƒì„±ìŠ¤ë ˆë“œìˆ˜ 1ê°œ ì„¤ì •
+        workerGroup = new NioEventLoopGroup(); //ì—°ê²°ëœ í´ë¼ì´ì–¸íŠ¸ ì†Œì¼“ìœ¼ë¡œë¶€í„° ë°ì´í„° ì…ì¶œë ¥ ë° ì´ë²¤íŠ¸ ì²˜ë¦¬ ë‹´ë‹¹
+        
         	
-        	//ServerBootstrap: ¼­¹ö ¾ÖÇÃ¸®ÄÉÀÌ¼ÇÀ» À§ÇÑ ºÎÆ®½ºÆ®·¦
-        	//Bootstrap: Å¬¶óÀÌ¾ğÆ®¸¦ À§ÇÑ ºÎÆ®½ºÆ®·¦
-            ServerBootstrap b = new ServerBootstrap();
+        	//ServerBootstrap: ì„œë²„ ì• í”Œë¦¬ì¼€ì´ì…˜ì„ ìœ„í•œ ë¶€íŠ¸ìŠ¤íŠ¸ë©
+        	//Bootstrap: í´ë¼ì´ì–¸íŠ¸ë¥¼ ìœ„í•œ ë¶€íŠ¸ìŠ¤íŠ¸ë©
+             b = new ServerBootstrap();
             
-            //ºÎÆ®½ºÆ®·¦Àº ºô´õ ÆĞÅÏÀ¸·Î ±¸ÇöµÇ¾î ÀÖ¾î¼­ ´Ù¾çÇÑ ¼³Á¤ÀÌ °¡´ÉÇÔ
+            //ë¶€íŠ¸ìŠ¤íŠ¸ë©ì€ ë¹Œë” íŒ¨í„´ìœ¼ë¡œ êµ¬í˜„ë˜ì–´ ìˆì–´ì„œ ë‹¤ì–‘í•œ ì„¤ì •ì´ ê°€ëŠ¥í•¨
             b.option(ChannelOption.SO_BACKLOG, 1024);
-            b.group(bossGroup, workerGroup) //°´Ã¼ ÃÊ±âÈ­ ½ÃÀÛ
-                    .channel(NioServerSocketChannel.class) //¼­¹ö ¼ÒÄÏÀÌ »ç¿ëÇÒ ÀÔÃâ·Â ¸ğµå ¼³Á¤,  NioServerSocketChannel: ³íºí·ÎÅ· ¸ğµåÀÇ ¼­¹ö ¼ÒÄÏ Ã¤³ÎÀ» »ı¼ºÇÏ´Â Å¬·¡½º
-                    .childHandler(new ChannelInitializer<Channel>() { //Å¬¶óÀÌ¾ğÆ®·Î ºÎÅÍ ¿¬°áµÈ Ã¤³ÎÀÌ ÃÊ±âÈ­µÉ¶§ ±âº»µ¿ÀÛÀÌ ÁöÁ¤µÈ Ãß»óÅ¬·¡½º
+            b.group(bossGroup, workerGroup) //ê°ì²´ ì´ˆê¸°í™” ì‹œì‘
+                    .channel(NioServerSocketChannel.class) //ì„œë²„ ì†Œì¼“ì´ ì‚¬ìš©í•  ì…ì¶œë ¥ ëª¨ë“œ ì„¤ì •,  NioServerSocketChannel: ë…¼ë¸”ë¡œí‚¹ ëª¨ë“œì˜ ì„œë²„ ì†Œì¼“ ì±„ë„ì„ ìƒì„±í•˜ëŠ” í´ë˜ìŠ¤
+                    .childHandler(new ChannelInitializer<Channel>() { //í´ë¼ì´ì–¸íŠ¸ë¡œ ë¶€í„° ì—°ê²°ëœ ì±„ë„ì´ ì´ˆê¸°í™”ë ë•Œ ê¸°ë³¸ë™ì‘ì´ ì§€ì •ëœ ì¶”ìƒí´ë˜ìŠ¤
 
 						@Override
 						protected void initChannel(Channel ch) throws Exception {
-							ch.pipeline().addLast(new NettySocketHandler()); // Ã¤³ÎÀÇ ÆÄÀÌÇÁ¶óÀÎ¿¡ ÇÚµé·¯ µî·Ï, WebSocketHandler: Å¬¶óÀÌ¾ğÆ® ¿¬°áÀÌ »ı¼ºµÇ¾úÀ» °æ¿ì µ¥ÀÌÅÍ Ã³¸® ´ã´ç
+							// ì±„ë„ì˜ íŒŒì´í”„ë¼ì¸ì— í•¸ë“¤ëŸ¬ ë“±ë¡, WebSocketHandler: í´ë¼ì´ì–¸íŠ¸ ì—°ê²°ì´ ìƒì„±ë˜ì—ˆì„ ê²½ìš° ë°ì´í„° ì²˜ë¦¬ ë‹´ë‹¹
+							ch.pipeline().addLast("socketServerHandler",new NettySocketHandler()); 
 							
 						}
 					});
+            doConnect();
 
-            //Æ÷Æ®¸¦ ¿©·¯°³ ¹ÙÀÎµùÇØµµ ¹®Á¦µÇÁö ¾Ê´Â´Ù
-            //https://groups.google.com/g/netty-ko/c/-9FKO0lyDPc
-            //https://groups.google.com/g/netty-ko/c/2dAGfzoqTpw
-            //¸ÖÆ¼Æ÷Æ® ¹ÙÀÎµù¹æ¹ı
-            //https://blog.naver.com/PostView.nhn?isHttpsRedirect=true&blogId=hsunryou&logNo=220919284980
-            ChannelFuture ch = b.bind(PORT).sync(); 	//¼­¹ö¸¦ ºñµ¿±â ½ÄÀ¸·Î ¹ÙÀÎµù ÇÑ´Ù. sync() ´Â ¹ÙÀÎµùÀÌ ¿Ï·áµÇ±â¸¦ ´ë±âÇÑ´Ù.
-            ChannelFuture ch1 = b.bind(8081).sync(); 	//¼­¹ö¸¦ ºñµ¿±â ½ÄÀ¸·Î ¹ÙÀÎµù ÇÑ´Ù. sync() ´Â ¹ÙÀÎµùÀÌ ¿Ï·áµÇ±â¸¦ ´ë±âÇÑ´Ù.
-            
-            
-            ch.channel().closeFuture().sync(); //Ã¤³ÎÀÇ CloseFuture¸¦ ¾ò°í ¿Ï·á µÉ¶§ ±îÁö ÇöÀç ½º·¹µå¸¦ ºí·ÎÅ·ÇÑ´Ù.
-            ch1.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-        	// Group À» Á¾·á ÇÏ°í ¸ğµç ¸®¼Ò½º¸¦ ÇØÁ¦ ÇÑ´Ù.
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
   }
+  
+  	private void doConnect() throws InterruptedException {
+
+                	 //í¬íŠ¸ë¥¼ ì—¬ëŸ¬ê°œ ë°”ì¸ë”©í•´ë„ ë¬¸ì œë˜ì§€ ì•ŠëŠ”ë‹¤
+                    //https://groups.google.com/g/netty-ko/c/-9FKO0lyDPc
+                    //https://groups.google.com/g/netty-ko/c/2dAGfzoqTpw
+                    //ë©€í‹°í¬íŠ¸ ë°”ì¸ë”©ë°©ë²•
+                    //https://blog.naver.com/PostView.nhn?isHttpsRedirect=true&blogId=hsunryou&logNo=220919284980
+                    ChannelFuture ch = b.bind(PORT).sync(); 	//ì„œë²„ë¥¼ ë¹„ë™ê¸° ì‹ìœ¼ë¡œ ë°”ì¸ë”© í•œë‹¤. sync() ëŠ” ë°”ì¸ë”©ì´ ì™„ë£Œë˜ê¸°ë¥¼ ëŒ€ê¸°í•œë‹¤.
+                    ChannelFuture ch1 = b.bind(8081).sync(); 	//ì„œë²„ë¥¼ ë¹„ë™ê¸° ì‹ìœ¼ë¡œ ë°”ì¸ë”© í•œë‹¤. sync() ëŠ” ë°”ì¸ë”©ì´ ì™„ë£Œë˜ê¸°ë¥¼ ëŒ€ê¸°í•œë‹¤.
+                    
+                    ch.channel().closeFuture().sync(); //ì±„ë„ì˜ CloseFutureë¥¼ ì–»ê³  ì™„ë£Œ ë ë•Œ ê¹Œì§€ í˜„ì¬ ìŠ¤ë ˆë“œë¥¼ ë¸”ë¡œí‚¹í•œë‹¤.
+                    ch1.channel().closeFuture().sync();
+  }
+  	
+  	public void serverStop()throws InterruptedException {
+  		System.out.println("ì„œë²„ ë‹«ì„ê»˜ì—¼");
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+        b.group().shutdownGracefully();
+  	}
   
 
 }

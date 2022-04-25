@@ -2,7 +2,9 @@ package com.example.demo.controller.webSocket_nettyTest;
 
 import io.netty.bootstrap.Bootstrap;  
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
@@ -10,32 +12,40 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.net.InetSocketAddress;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class EchoClient {
+	
+	
 public EchoClient(){
 }
 
 public void start() throws Exception {
+	System.out.println("í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì— ì—°ê²°ì„ ì‹œë„í•œë‹¤.");
     EventLoopGroup group = new NioEventLoopGroup();
-    try {
+   // try {
     	
-     	//ServerBootstrap: ¼­¹ö ¾ÖÇÃ¸®ÄÉÀÌ¼ÇÀ» À§ÇÑ ºÎÆ®½ºÆ®·¦
-    	//Bootstrap: Å¬¶óÀÌ¾ğÆ®¸¦ À§ÇÑ ºÎÆ®½ºÆ®·¦
-        Bootstrap b = new Bootstrap();  // bootstrap »ı¼º
-        b.group(group)  // Å¬¶óÀÌ¾ğÆ® ÀÌº¥Æ® Ã³¸®ÇÒ EventLoopGroupÀ» ÁöÁ¤.
-                .channel(NioSocketChannel.class)    // Ã¤³Î À¯Çü NIO ÁöÁ¤
-                .remoteAddress(new InetSocketAddress("192.168.0.62",8082)) // ¼­¹öÀÇ InetSocketAddress¸¦ ¼³Á¤ÇÏ¸é ³»ºÎÀûÀ¸·Î ¿¬°á ½Ãµµ
-                .handler(new ChannelInitializer<SocketChannel>() { //ÇÚµé·¯ µî·Ï, ChannelInitializerÀº ChannelInboundHandlerAdapter »ó¼Ó ¹Ş°íÀÖ´Âµ¥
-                	//ChannelInboundHandlerAdapter¸¦ »ó¼Ó¹Ş°íÀÖ´Â Ä¿½ºÅÒÇÚµé·¯¸¦ »ı¼ºÇÏ¸é À¯Àú°¡ ³»ºÎ Çàµ¿À» Á¶ÀÛÇÒ¼öÀÖÀ½
+     	//ServerBootstrap: ì„œë²„ ì• í”Œë¦¬ì¼€ì´ì…˜ì„ ìœ„í•œ ë¶€íŠ¸ìŠ¤íŠ¸ë©
+    	//Bootstrap: í´ë¼ì´ì–¸íŠ¸ë¥¼ ìœ„í•œ ë¶€íŠ¸ìŠ¤íŠ¸ë©
+        Bootstrap b = new Bootstrap();  // bootstrap ìƒì„±
+        b.group(group)  // í´ë¼ì´ì–¸íŠ¸ ì´ë²¤íŠ¸ ì²˜ë¦¬í•  EventLoopGroupì„ ì§€ì •.
+                .channel(NioSocketChannel.class)    // ì±„ë„ ìœ í˜• NIO ì§€ì •
+                .remoteAddress(new InetSocketAddress("192.168.0.62",8082)) // ì„œë²„ì˜ InetSocketAddressë¥¼ ì„¤ì •í•˜ë©´ ë‚´ë¶€ì ìœ¼ë¡œ ì—°ê²° ì‹œë„
+                .handler(new ChannelInitializer<SocketChannel>() { //í•¸ë“¤ëŸ¬ ë“±ë¡, ChannelInitializerì€ ChannelInboundHandlerAdapter ìƒì† ë°›ê³ ìˆëŠ”ë°
+                	//ChannelInboundHandlerAdapterë¥¼ ìƒì†ë°›ê³ ìˆëŠ” ì»¤ìŠ¤í…€í•¸ë“¤ëŸ¬ë¥¼ ìƒì„±í•˜ë©´ ìœ ì €ê°€ ë‚´ë¶€ í–‰ë™ì„ ì¡°ì‘í• ìˆ˜ìˆìŒ
                     @Override
-                    public void initChannel(SocketChannel ch) throws Exception {    // Ã¤³ÎÀÌ »ı¼ºµÉ ¶§ ÆÄÀÌÇÁ¶óÀÎ¿¡ EchoClientHandler ÇÏ³ª¸¦ Ãß°¡
-                        ch.pipeline().addLast(new EchoClientHandler());
+                    public void initChannel(SocketChannel ch) throws Exception {    // ì±„ë„ì´ ìƒì„±ë  ë•Œ íŒŒì´í”„ë¼ì¸ì— EchoClientHandler í•˜ë‚˜ë¥¼ ì¶”ê°€
+                        ChannelPipeline pipeline = ch.pipeline();
+                        		pipeline.addLast(new EchoClientHandler());
                     }
                 });
-        ChannelFuture f = b.connect().sync();   // ¿ø°İ ÇÇ¾î·Î ¿¬°áÇÏ°í ¿¬°áÀÌ ¿Ï·áµÇ±â¸¦ ±â´Ù¸²
-        f.channel().closeFuture().sync();   // Ã¤³ÎÀÌ ´İÈú ¶§±îÁö ºí·ÎÅ·ÇÔ.
-    } finally {
-        group.shutdownGracefully().sync();  // ½º·¹µå Ç®À» Á¾·áÇÏ°í ¸ğµç ¸®¼Ò½º¸¦ ÇØÁ¦ÇÔ
-    }
+             
+        ChannelFuture f = b.connect().sync();   // ì›ê²© í”¼ì–´ë¡œ ì—°ê²°í•˜ê³  ì—°ê²°ì´ ì™„ë£Œë˜ê¸°ë¥¼ ê¸°ë‹¤ë¦¼
+        f.channel().closeFuture().sync();   // ì±„ë„ì´ ë‹«í ë•Œê¹Œì§€ ë¸”ë¡œí‚¹í•¨.
+   // } finally {
+   //     group.shutdownGracefully().sync();  // ìŠ¤ë ˆë“œ í’€ì„ ì¢…ë£Œí•˜ê³  ëª¨ë“  ë¦¬ì†ŒìŠ¤ë¥¼ í•´ì œí•¨
+   // }
 }
 
 public static void main(String[] args) throws Exception {

@@ -24,14 +24,14 @@ public class WebSocketConfig {
 	            System.out.println("client is connected. sessionId == [" + sessionId + "]");
 	            sessionList.add(session);
 	            
-	            // À¥¼ÒÄÏ ¿¬°á ¼º¸³µÇ¾î ÀÖ´Â ¸ğµç »ç¿ëÀÚ¿¡°Ô ¸Ş½ÃÁö Àü¼Û
+	            // ì›¹ì†Œì¼“ ì—°ê²° ì„±ë¦½ë˜ì–´ ìˆëŠ” ëª¨ë“  ì‚¬ìš©ìì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
 	            sendMessageToAll("***** [USER-" + sessionId + "] is connected. *****");
 	        }
 	    }
 	    
 
 	    /**
-	     * À¥¼ÒÄÏ ¸Ş½ÃÁö(From Client) ¼ö½ÅÇÏ´Â °æ¿ì È£Ãâ
+	     * ì›¹ì†Œì¼“ ë©”ì‹œì§€(From Client) ìˆ˜ì‹ í•˜ëŠ” ê²½ìš° í˜¸ì¶œ
 	     */
 	    @OnMessage
 	    public String handleMessage(String message, Session session) {
@@ -39,7 +39,7 @@ public class WebSocketConfig {
 	            String sessionId = session.getId();
 	            System.out.println("message is arrived. sessionId == [" + sessionId + "] / message == [" + message + "]");
 
-	            // À¥¼ÒÄÏ ¿¬°á ¼º¸³µÇ¾î ÀÖ´Â ¸ğµç »ç¿ëÀÚ¿¡°Ô ¸Ş½ÃÁö Àü¼Û
+	            // ì›¹ì†Œì¼“ ì—°ê²° ì„±ë¦½ë˜ì–´ ìˆëŠ” ëª¨ë“  ì‚¬ìš©ìì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
 	            sendMessageToAll("[USER-" + sessionId + "] " + message);
 	        }
 
@@ -48,7 +48,7 @@ public class WebSocketConfig {
 	    
 
 	    /**
-	     * À¥¼ÒÄÏ »ç¿ëÀÚ ¿¬°á ÇØÁ¦ÇÏ´Â °æ¿ì È£Ãâ
+	     * ì›¹ì†Œì¼“ ì‚¬ìš©ì ì—°ê²° í•´ì œí•˜ëŠ” ê²½ìš° í˜¸ì¶œ
 	     */
 	    @OnClose
 	    public void handleClose(Session session) {
@@ -56,14 +56,14 @@ public class WebSocketConfig {
 	            String sessionId = session.getId();
 	            System.out.println("client is disconnected. sessionId == [" + sessionId + "]");
 	            
-	            // À¥¼ÒÄÏ ¿¬°á ¼º¸³µÇ¾î ÀÖ´Â ¸ğµç »ç¿ëÀÚ¿¡°Ô ¸Ş½ÃÁö Àü¼Û
+	            // ì›¹ì†Œì¼“ ì—°ê²° ì„±ë¦½ë˜ì–´ ìˆëŠ” ëª¨ë“  ì‚¬ìš©ìì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
 	            sendMessageToAll("***** [USER-" + sessionId + "] is disconnected. *****");
 	        }
 	    }
 
 	    
 	    /**
-	     * À¥¼ÒÄÏ ¿¡·¯ ¹ß»ıÇÏ´Â °æ¿ì È£Ãâ
+	     * ì›¹ì†Œì¼“ ì—ëŸ¬ ë°œìƒí•˜ëŠ” ê²½ìš° í˜¸ì¶œ
 	     */
 	    @OnError
 	    public void handleError(Throwable t) {
@@ -72,7 +72,7 @@ public class WebSocketConfig {
 	    
 	    
 	    /**
-	     * À¥¼ÒÄÏ ¿¬°á ¼º¸³µÇ¾î ÀÖ´Â ¸ğµç »ç¿ëÀÚ¿¡°Ô ¸Ş½ÃÁö Àü¼Û
+	     * ì›¹ì†Œì¼“ ì—°ê²° ì„±ë¦½ë˜ì–´ ìˆëŠ” ëª¨ë“  ì‚¬ìš©ìì—ê²Œ ë©”ì‹œì§€ ì „ì†¡
 	     */
 	    private boolean sendMessageToAll(String message) {
 	        if (sessionList == null) {

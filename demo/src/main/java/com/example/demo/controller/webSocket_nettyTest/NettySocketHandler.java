@@ -4,11 +4,15 @@ import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.web.socket.PingMessage;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter; 
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.timeout.IdleState;
+import io.netty.handler.timeout.IdleStateEvent; 
 
 
 
@@ -46,20 +50,20 @@ public class NettySocketHandler extends ChannelInboundHandlerAdapter {
             }*/
             String readMessage = ((ByteBuf) msg).toString(Charset.defaultCharset());
             
-            //³»ºÎÀûÀ¸·Î ±â·Ï°ú Àü¼ÛÀÇ µÎ°¡Áö ¸Ş¼­µå ½ÇÇà, write():Ã¤³Î¿¡ µ¥ÀÌÅÍ ±â·Ï, flush():Ã¤³Î¿¡ ±â·ÏµÈ µ¥ÀÌÅÍ ¼­¹ö·ÎÀü¼Û
-            //flush·Î Ã¤³Î¿¡ ÀÖ´ø°ÍÀ» ¼­¹ö·Î Àü¼ÛÇß±â¶§¹®¿¡ Ãß±¸ syso·Î Ãâ·ÂÇØº¼¼ö ÀÖ´Â°ÍÀÌ´Ù.
-            //write¸¸ ›§À»¶§´Â ÄÜ¼Ö¿¡ Ãâ·ÂÀÌ ¾ÈµÊÀ» È®ÀÎÇÏ¿´À½
+            //ë‚´ë¶€ì ìœ¼ë¡œ ê¸°ë¡ê³¼ ì „ì†¡ì˜ ë‘ê°€ì§€ ë©”ì„œë“œ ì‹¤í–‰, write():ì±„ë„ì— ë°ì´í„° ê¸°ë¡, flush():ì±„ë„ì— ê¸°ë¡ëœ ë°ì´í„° ì„œë²„ë¡œì „ì†¡
+            //flushë¡œ ì±„ë„ì— ìˆë˜ê²ƒì„ ì„œë²„ë¡œ ì „ì†¡í–ˆê¸°ë•Œë¬¸ì— ì¶”êµ¬ sysoë¡œ ì¶œë ¥í•´ë³¼ìˆ˜ ìˆëŠ”ê²ƒì´ë‹¤.
+            //writeë§Œ ì»ì„ë•ŒëŠ” ì½˜ì†”ì— ì¶œë ¥ì´ ì•ˆë¨ì„ í™•ì¸í•˜ì˜€ìŒ
             ctx.writeAndFlush(msg);
-            //3. ¼ö½ÅµÈ µ¥ÀÌÅÍ¸¦ °¡Áö°í ÀÖ´Â ³×Æ¼ÀÇ ¹ÙÀÌÆ® ¹öÆÛ °´Ã¼·Î ºÎÅÍ ¹®ÀÚ¿­ °´Ã¼¸¦ ÀĞ¾î¿Â´Ù.
-            System.out.println("¼ö½ÅÇÑ ¹®ÀÚ¿­ ["+readMessage +"]");
+            //3. ìˆ˜ì‹ ëœ ë°ì´í„°ë¥¼ ê°€ì§€ê³  ìˆëŠ” ë„¤í‹°ì˜ ë°”ì´íŠ¸ ë²„í¼ ê°ì²´ë¡œ ë¶€í„° ë¬¸ìì—´ ê°ì²´ë¥¼ ì½ì–´ì˜¨ë‹¤.
+            System.out.println("ìˆ˜ì‹ í•œ ë¬¸ìì—´ ["+readMessage +"]");
            
         }
 	
-	   //Ã¤³ÎÀÌ È°¼ºÈ­ µÇ¸é ÀÚµ¿À¸·Î È£Ãâ(ex.Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡ ¿¬°áÇßÀ»°æ¿ì)
+	   //ì±„ë„ì´ í™œì„±í™” ë˜ë©´ ìë™ìœ¼ë¡œ í˜¸ì¶œ(ex.í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì— ì—°ê²°í–ˆì„ê²½ìš°)
 		@Override
 	    public void channelActive(ChannelHandlerContext ctx) throws Exception {
 	        //ctx.fireChannelActive();
-			System.out.println("Ã¤³ÎÀÌ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+			System.out.println("ì±„ë„ì´ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
 			
 			Channel income = ctx.channel();
 			InetSocketAddress localAddress = (InetSocketAddress)income.localAddress();
@@ -69,40 +73,43 @@ public class NettySocketHandler extends ChannelInboundHandlerAdapter {
 			System.out.println(getStatus());
 	    }
     
-	   //Ã¤³ÎÀÌ ºñ È°¼ºÈ­ µÇ¸é ÀÚµ¿À¸·Î È£Ãâ(ex.Å¬¶óÀÌ¾ğÆ®°¡ ¼­¹ö¿¡ ¿¬°áÀ» ²÷¾úÀ»°æ¿ì)
-	   //°í¹Î°Å¸®
-	   //¸ÖÆ¼ Å¬¶óÀÌ¾ğÆ®¿¡¼­ ¿¬°áÁßÀÎµ¥ ±×Áß ÇÏ³ª°¡ ²÷°åÀ»½Ã ¾î¶² Å¬¶óÀÌ¾ğÆ®°¡ ²÷°å´ÂÁö ¾î¶»°Ô ÆÇ´ÜÇØÁÙ°ÍÀÎ°¡?
-	   //https://groups.google.com/g/netty-ko/c/XlpMAhPGu9M Âü°í
+	   //ì±„ë„ì´ ë¹„ í™œì„±í™” ë˜ë©´ ìë™ìœ¼ë¡œ í˜¸ì¶œ(ex.í´ë¼ì´ì–¸íŠ¸ê°€ ì„œë²„ì— ì—°ê²°ì„ ëŠì—ˆì„ê²½ìš°)
+	   //ê³ ë¯¼ê±°ë¦¬
+	   //ë©€í‹° í´ë¼ì´ì–¸íŠ¸ì—ì„œ ì—°ê²°ì¤‘ì¸ë° ê·¸ì¤‘ í•˜ë‚˜ê°€ ëŠê²¼ì„ì‹œ ì–´ë–¤ í´ë¼ì´ì–¸íŠ¸ê°€ ëŠê²¼ëŠ”ì§€ ì–´ë–»ê²Œ íŒë‹¨í•´ì¤„ê²ƒì¸ê°€?
+	   //https://groups.google.com/g/netty-ko/c/XlpMAhPGu9M ì°¸ê³ 
 	   @Override
 	    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 	       // ctx.fireChannelInactive();
-		   System.out.println("Ã¤³ÎÀÌ ºñ È°¼ºÈ­µÇ¾ú½À´Ï´Ù.");
+		   System.out.println("ì±„ë„ì´ ë¹„ í™œì„±í™”ë˜ì—ˆìŠµë‹ˆë‹¤.");
 		   
 			Channel income = ctx.channel();
 			InetSocketAddress localAddress = (InetSocketAddress)income.localAddress();
 			System.out.println(localAddress.getPort());
 			changeNetworkFalse(localAddress.getPort());
 			System.out.println(getStatus());
-	    }  
+	    } 
+	   
     
-    //6. channelRead ÀÌº¥Æ®ÀÇ Ã³¸®°¡ ¿Ï·áµÈ ÈÄ ÀÚµ¿À¸·Î ¼öÇàµÇ´Â ÀÌº¥Æ® ¸Ş¼­µå
+    //6. channelRead ì´ë²¤íŠ¸ì˜ ì²˜ë¦¬ê°€ ì™„ë£Œëœ í›„ ìë™ìœ¼ë¡œ ìˆ˜í–‰ë˜ëŠ” ì´ë²¤íŠ¸ ë©”ì„œë“œ
     /* @Override
     public void channelReadComplete(ChannelHandlerContext ctx){
 
    
       ctx.flush();
-      //7. Ã¤³Î ÆÄÀÌÇÁ ¶óÀÎ¿¡ ÀúÀåµÈ ¹öÆÛ¸¦ Àü¼Û
+      //7. ì±„ë„ íŒŒì´í”„ ë¼ì¸ì— ì €ì¥ëœ ë²„í¼ë¥¼ ì „ì†¡
     }
    */
-    
+	   
     /*
-     Ã¤³Î¿¡ ¿¹¿Ü ÅÍ ºÀ»¶§ È£ÃâµÈ´Ù.
+     ì±„ë„ì— ì˜ˆì™¸ í„°ì¡‹ì„ë•Œ í˜¸ì¶œëœë‹¤.
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
       cause.printStackTrace();
       ctx.close();
     }
      */
+	   
+	   
 
 	  private void changeNetworkTrue(int port) {
 		  network.changeNetworkTrue(port);
