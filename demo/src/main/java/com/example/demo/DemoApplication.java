@@ -13,7 +13,7 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 	
-	//SockJS ¹æ½ÄÀÌ ¾Æ´Ñ WebSocket ¹æ½Ä
+	//SockJS ë°©ì‹ì´ ì•„ë‹Œ WebSocket ë°©ì‹
 	@Bean
     public ServerEndpointExporter serverEndpointExporter() {
         return new ServerEndpointExporter();

@@ -8,15 +8,15 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-//SockJS »ç¿ë
+//SockJS ì‚¬ìš©
 public class SocketJsWebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
   @Override
   public void configureMessageBroker(MessageBrokerRegistry config) {
-    config.enableSimpleBroker("/topic"); // /topic À¸·Î ½ÃÀÛÇÏ´Â destination Çì´õ¸¦ °¡Áø ¸Ş¼¼Áö¸¦ ºê·ÎÄ¿·Î ¶ó¿ìÆÃÇÑ´Ù.
-    config.setApplicationDestinationPrefixes("/app"); // /app °æ·Î·Î ½ÃÀÛÇÏ´Â STOMP ¸Ş¼¼ÁöÀÇ destination Çì´õ´Â @Controller °´Ã¼ÀÇ @MessageMapping ¸Ş¼­µå·Î ¶ó¿ìÆÃµÈ´Ù.
+    config.enableSimpleBroker("/topic"); // /topic ìœ¼ë¡œ ì‹œì‘í•˜ëŠ” destination í—¤ë”ë¥¼ ê°€ì§„ ë©”ì„¸ì§€ë¥¼ ë¸Œë¡œì»¤ë¡œ ë¼ìš°íŒ…í•œë‹¤.
+    config.setApplicationDestinationPrefixes("/app"); // /app ê²½ë¡œë¡œ ì‹œì‘í•˜ëŠ” STOMP ë©”ì„¸ì§€ì˜ destination í—¤ë”ëŠ” @Controller ê°ì²´ì˜ @MessageMapping ë©”ì„œë“œë¡œ ë¼ìš°íŒ…ëœë‹¤.
   
-  //enableSimpleBroker: ÇØ´ç °æ·Î·Î SimpleBroker¸¦ µî·Ï,SimpleBroker´Â ÇØ´çÇÏ´Â °æ·Î¸¦ SUBSCRIBEÇÏ´Â Client¿¡°Ô ¸Ş¼¼Áö¸¦ Àü´ŞÇÏ´Â °£´ÜÇÑ ÀÛ¾÷À» ¼öÇà 
+  //enableSimpleBroker: í•´ë‹¹ ê²½ë¡œë¡œ SimpleBrokerë¥¼ ë“±ë¡,SimpleBrokerëŠ” í•´ë‹¹í•˜ëŠ” ê²½ë¡œë¥¼ SUBSCRIBEí•˜ëŠ” Clientì—ê²Œ ë©”ì„¸ì§€ë¥¼ ì „ë‹¬í•˜ëŠ” ê°„ë‹¨í•œ ì‘ì—…ì„ ìˆ˜í–‰ 
   }
 
   @Override

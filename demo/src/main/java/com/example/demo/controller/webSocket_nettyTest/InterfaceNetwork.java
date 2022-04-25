@@ -2,7 +2,7 @@ package com.example.demo.controller.webSocket_nettyTest;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-//�̱��� 
+//Enum 싱글톤 클래스 => 네티를 통해서 클라이언트의 네트워크 상태값을 저장하고 있다.
 public enum InterfaceNetwork {
 	INSTANCE;
 	
